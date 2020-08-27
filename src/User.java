@@ -2,7 +2,6 @@
 public class User {
 	private String username;
 	private String password;
-	private Thread thread;
 	
 	public String getUsername() {
 		return username;
@@ -16,11 +15,14 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public Thread getThread() {
-		return thread;
+	
+	public User(String username, String password) {
+		super();
+		this.username = username;
+		this.password = password;
 	}
-	public void setThread(Thread thread) {
-		this.thread = thread;
+	public User() {
+		super();
 	}
 	
 	

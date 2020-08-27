@@ -20,7 +20,7 @@ public class Client {
 		BufferedReader is = null;
 		
 		try {
-			socketOfClient = new Socket(serverHost, 1234);
+			socketOfClient = new Socket(serverHost, 1235);
 			
 			os = new BufferedWriter(new OutputStreamWriter(socketOfClient.getOutputStream()));
 			
@@ -39,16 +39,27 @@ public class Client {
 			Scanner scanner = new Scanner(System.in);
 			String username = scanner.nextLine();
 			user.setUsername(username);
-			
+			os.write("username : " + user.getUsername());
+			os.newLine();
+			os.flush();
 			
 			System.out.print("Enter password: ");
 			String password = scanner.nextLine();
 			user.setPassword(password);
 			
-			os.write("Welcome, " + user.getUsername());
+			os.write("password : " + user.getPassword());
 			os.newLine();
 			os.flush();
 			
+			System.out.println("Nhap tin nhan: ");
+			String message = scanner.nextLine();
+			os.write(message);
+			os.newLine();
+			os.flush();
+			
+			os.write("QUIT");
+			os.newLine();
+			os.flush();
 			
 			String responseLine;
 			while ((responseLine = is.readLine()) != null) {
