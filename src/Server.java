@@ -41,7 +41,7 @@ public class Server {
 	private static class ServiceThread extends Thread{
 		private int clientNumber;
 		private Socket socketOfServer;
-		
+		private User user;
 		
 		
 		public ServiceThread(Socket socketOfServer, int clientNumber) {

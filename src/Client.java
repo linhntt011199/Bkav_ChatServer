@@ -5,10 +5,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class Client {
 	
-	private User user;
+	
 
 	public static void main(String[] args) {
 		
@@ -33,15 +34,21 @@ public class Client {
 		}
 		
 		try {
-			os.write("HELO");
+			User user = new User();
+			System.out.print("Enter username: ");
+			Scanner scanner = new Scanner(System.in);
+			String username = scanner.nextLine();
+			user.setUsername(username);
+			
+			
+			System.out.print("Enter password: ");
+			String password = scanner.nextLine();
+			user.setPassword(password);
+			
+			os.write("Welcome, " + user.getUsername());
 			os.newLine();
 			os.flush();
-			os.write("I am Tom Cat");
-			os.newLine();
-			os.flush();
-			os.write("QUIT");
-			os.newLine();
-			os.flush();
+			
 			
 			String responseLine;
 			while ((responseLine = is.readLine()) != null) {
