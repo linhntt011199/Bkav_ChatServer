@@ -1,3 +1,4 @@
+import javax.crypto.CipherOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -8,75 +9,67 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Client {
-	
-	
 
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws IOException {
+
 		final String serverHost = "localHost";
-		
+
 		Socket socketOfClient = null;
 		BufferedWriter os = null;
 		BufferedReader is = null;
-		
+
+		Scanner scanner = new Scanner(System.in);
+
 		try {
-			socketOfClient = new Socket(serverHost, 1235);
-			
+			socketOfClient = new Socket(serverHost, 1239);
+
 			os = new BufferedWriter(new OutputStreamWriter(socketOfClient.getOutputStream()));
-			
+
 			is = new BufferedReader(new InputStreamReader(socketOfClient.getInputStream()));
 		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host " + serverHost );
+			System.err.println("Don't know about host" + serverHost);
 			return;
 		} catch (IOException e) {
 			System.err.println("Couldn't get I/O for the connection to " + serverHost);
 			return;
 		}
-		
+
 		try {
-			User user = new User();
 			System.out.print("Enter username: ");
-			Scanner scanner = new Scanner(System.in);
 			String username = scanner.nextLine();
-			user.setUsername(username);
-			os.write("username : " + user.getUsername());
+			os.write(username);
 			os.newLine();
 			os.flush();
-			
+
 			System.out.print("Enter password: ");
 			String password = scanner.nextLine();
-			user.setPassword(password);
-			
-			os.write("password : " + user.getPassword());
+			os.write(password);
 			os.newLine();
 			os.flush();
-			
-			System.out.println("Nhap tin nhan: ");
-			String message = scanner.nextLine();
-			os.write(message);
-			os.newLine();
-			os.flush();
-			
-			os.write("QUIT");
-			os.newLine();
-			os.flush();
-			
-			String responseLine;
-			while ((responseLine = is.readLine()) != null) {
-				System.out.println("Server: " + responseLine);
-				if (responseLine.indexOf("OK") != -1) {
+
+			while (true) {
+				System.out.print("Enter: ");
+				String message = scanner.nextLine();
+				if (message.equals("QUIT"))
 					break;
+				os.write(message);
+				os.newLine();
+				os.flush();
+
+				while (true) {
+					String responseLine = is.readLine();
+					if (responseLine == null || responseLine.equals("")) break;
+					System.out.println("Server: " + responseLine);
 				}
 			}
-			
+
 			os.close();
 			is.close();
 			socketOfClient.close();
 		} catch (UnknownHostException e) {
 			System.err.println("Trying to connect to unknown host: " + e);
 		} catch (IOException e) {
-			System.out.println("IOException: " + e);
+			System.err.println("IOException: " + e);
 		}
 	}
-
 }
