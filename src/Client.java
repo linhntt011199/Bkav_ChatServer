@@ -21,7 +21,7 @@ public class Client {
 		Scanner scanner = new Scanner(System.in);
 
 		try {
-			socketOfClient = new Socket(serverHost, 1239);
+			socketOfClient = new Socket(serverHost, 1234);
 
 			os = new BufferedWriter(new OutputStreamWriter(socketOfClient.getOutputStream()));
 
@@ -48,6 +48,7 @@ public class Client {
 			os.flush();
 
 			while (true) {
+
 				System.out.print("Enter: ");
 				String message = scanner.nextLine();
 				if (message.equals("QUIT"))

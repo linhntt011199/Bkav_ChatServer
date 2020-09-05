@@ -27,7 +27,7 @@ public class Server {
 		System.out.println("Server is waiting to accept user...");
 		int clientNumber = 0;
 		try {
-			listener = new ServerSocket(1239);
+			listener = new ServerSocket(1234);
 		} catch (IOException e) {
 			System.out.println(e);
 			System.exit(1);
@@ -83,12 +83,6 @@ public class Server {
 			log("New connection with client#  " + this.clientNumber + " at " + socketOfServer);
 		}
 
-		private void sendMessage(String message) throws  IOException{
-			os.write(message);
-			os.newLine();
-			os.flush();
-		}
-
 		@Override
 		public void run() {
 			try {
@@ -111,13 +105,17 @@ public class Server {
 				}
 
 				if (line.contains("Chat")) {
+
 					int end = line.indexOf("'");
 					String usernameNhan = line.substring(5, end - 1);
 					String message = line.substring(end + 1, line.length() - 1);
 
 					for (ServiceThread worker : workers) {
 						if (worker.user.getUsername().equals(usernameNhan)) {
-							worker.os.write(this.user.getUsername() + ": " + message);
+							worker.os.write(" >> " + this.user.getUsername() + ": " + message);
+							worker.os.newLine();
+							worker.os.flush();
+							worker.os.write("");
 							worker.os.newLine();
 							worker.os.flush();
 							break;
