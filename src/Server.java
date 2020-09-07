@@ -1,9 +1,5 @@
 import javax.jws.soap.SOAPBinding;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,6 +10,9 @@ public class Server {
 	private static Map<String, User> listUsers = new HashMap<String, User>();
 	private static ArrayList<User> userOnline = new ArrayList<User>();
 	private static ArrayList<ServiceThread> workers = new ArrayList<ServiceThread>();
+
+	public final static int FILE_SIZE = 100;
+	public final static String FILE_TO_RECEIVED = "/home/tuanlab/Linh/Bkav_ChatServer/src/test1.txt";
 
 	public static void init() {
 		User user1 = new User("linh", "aaa");
@@ -73,6 +72,9 @@ public class Server {
 		private BufferedReader is;
 		private BufferedWriter os;
 		private User user;
+		private OutputStream out = null;
+		private InputStream in = null;
+
 
 
 		public ServiceThread(Socket socketOfServer, int clientNumber, User user) {
@@ -86,10 +88,10 @@ public class Server {
 		@Override
 		public void run() {
 			try {
+				in = socketOfServer.getInputStream();
 
-				is = new BufferedReader(new InputStreamReader(socketOfServer.getInputStream()));
+				is = new BufferedReader(new InputStreamReader(in));
 				os = new BufferedWriter(new OutputStreamWriter(socketOfServer.getOutputStream()));
-
 
 				String line = is.readLine();
 
@@ -105,11 +107,9 @@ public class Server {
 				}
 
 				if (line.contains("Chat")) {
-
 					int end = line.indexOf("'");
 					String usernameNhan = line.substring(5, end - 1);
 					String message = line.substring(end + 1, line.length() - 1);
-
 					for (ServiceThread worker : workers) {
 						if (worker.user.getUsername().equals(usernameNhan)) {
 							worker.os.write(" >> " + this.user.getUsername() + ": " + message);
@@ -123,20 +123,129 @@ public class Server {
 					}
 				}
 
+				if (line.contains("SEND")) {
+					//String usernameNhan = line.substring(5, line.length() - 1);
+
+					receiveFile();
+					//os.write("");
+					//os.newLine();
+					//os.flush();
+				}
+
 				if (line.equals("QUIT")) {
 					os.write("OK");
 					os.newLine();
 					os.flush();
-
 				}
-
 			} catch (IOException e) {
 				System.out.println(e);
+				e.printStackTrace();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
+		private void receiveFile() throws Exception {
+			/*byte [] myByteArray = new byte[FILE_SIZE];
+			InputStream in = socketOfServer.getInputStream();
+			FileOutputStream fos = new FileOutputStream(FILE_TO_RECEIVED);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			System.out.println(myByteArray.length);
+			int bytesRead = in.read(myByteArray, 0, myByteArray.length);
+			/*int current = bytesRead;
 
+			do {
+				bytesRead = in.read(myByteArray, current, (myByteArray.length - current));
+				if (bytesRead >= 0) current += bytesRead;
+			} while (bytesRead > -1);
+
+			//bos.write(myByteArray, 0, current);
+			bos.write(myByteArray, 0, bytesRead);
+			//bos.flush();
+			System.out.println("File " + FILE_TO_RECEIVED + " downloaded (" + bytesRead + " bytes read)");
+			//fos.close();
+			bos.close();
+			socketOfServer.close();+/ */
+			/*DataInputStream dis = new DataInputStream(in);
+			FileOutputStream fos = new FileOutputStream(FILE_TO_RECEIVED);
+			byte[] buffer = new byte[4096];
+
+			int filesize = 15123; // Send file size in separate msg
+			int read = 0;
+			int totalRead = 0;
+			int remaining = filesize;
+			while((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+				totalRead += read;
+				remaining -= read;
+				System.out.println("read " + totalRead + " bytes.");
+				fos.write(buffer, 0, read);
+			}
+
+			fos.close();
+			dis.close();*/
+			/*ObjectOutputStream oos = new ObjectOutputStream(socketOfServer.getOutputStream());
+			ObjectInputStream ois = new ObjectInputStream(socketOfServer.getInputStream());
+			FileOutputStream fos = null;
+			byte [] buffer = new byte[FILE_SIZE];
+
+			// 1. Read file name.
+			Object o = ois.readObject();
+
+			if (o instanceof String) {
+				fos = new FileOutputStream(o.toString());
+			} else {
+				throwException("Something is wrong");
+			}
+
+			// 2. Read file to the end.
+			Integer bytesRead = 0;
+
+			do {
+				o = ois.readObject();
+
+				if (!(o instanceof Integer)) {
+					throwException("Something is wrong");
+				}
+
+				bytesRead = (Integer)o;
+
+				o = ois.readObject();
+
+				if (!(o instanceof byte[])) {
+					throwException("Something is wrong");
+				}
+
+				buffer = (byte[])o;
+
+				// 3. Write data to output file.
+				fos.write(buffer, 0, bytesRead);
+
+			} while (bytesRead == FILE_SIZE);
+
+			System.out.println("File transfer success");
+
+			fos.close();
+
+			ois.close();
+			oos.close();*/
+
+			byte[] contents = new byte[10000];
+
+			FileOutputStream fos = new FileOutputStream(FILE_TO_RECEIVED);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			InputStream is = socketOfServer.getInputStream();
+
+			//No of bytes read in one read() call
+			int bytesRead = 0;
+
+			while((bytesRead=is.read(contents))!=-1)
+				bos.write(contents, 0, bytesRead);
+
+			bos.flush();
+			socketOfServer.close();
+
+			System.out.println("File saved successfully!");
+		}
 
 	}
 
