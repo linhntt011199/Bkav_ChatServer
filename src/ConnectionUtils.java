@@ -1,5 +1,7 @@
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConnectionUtils {
 
@@ -15,5 +17,9 @@ public class ConnectionUtils {
         System.out.println("Get connection " + conn);
 
         System.out.println("Done!");
+
+        Statement st = conn.createStatement();
+
+        conn.close();
     }
 }

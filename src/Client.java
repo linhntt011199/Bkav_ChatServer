@@ -1,26 +1,24 @@
-import javax.crypto.CipherOutputStream;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client {
 
-	private Socket socketOfClient = null;
 	public final static String FILE_TO_SEND = "/home/tuanlab/Linh/Bkav_ChatServer/src/test.txt";
 	private OutputStream out = null;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		Client client = new Client();
 		client.connectServer();
 	}
 
 	public void connectServer() {
 		final String serverHost = "localHost";
+		Socket socketOfClient;
 
-		BufferedWriter os = null;
-		BufferedReader is = null;
+		BufferedWriter os;
+		BufferedReader is;
 
 		Scanner scanner = new Scanner(System.in);
 
@@ -56,7 +54,7 @@ public class Client {
 
 				System.out.print("Enter: ");
 				String message = scanner.nextLine();
-				if (message.equals("QUIT "))
+				if (message.equals("QUIT"))
 					break;
 				if (message.contains("SEND")) sendFile();
 				os.write(message);
@@ -81,78 +79,21 @@ public class Client {
 	}
 
 	public void sendFile() throws IOException {
-		/*FileInputStream fis = null;
-		BufferedInputStream bis = null;
+		FileInputStream fis;
+		BufferedInputStream bis;
 		File myFile = new File(FILE_TO_SEND);
 
 		fis = new FileInputStream(myFile);
 		bis = new BufferedInputStream(fis);
+		byte [] myByteArray = new byte[(int) myFile.length()];
 		bis.read(myByteArray, 0, myByteArray.length);
 		System.out.println("Sending " + FILE_TO_SEND + "(" + myByteArray.length + " bytes)");
-		OutputStream out = socketOfClient.getOutputStream();
+
 		out.write(myByteArray, 0, myByteArray.length);
 		out.flush();
 		System.out.println("Done.");
-		bis.close();*/
-		//socketOfClient.close();
-		/*DataOutputStream dos = new DataOutputStream(out);
-		FileInputStream fis = new FileInputStream(FILE_TO_SEND);
-		byte[] myByteArray = new byte[4096];
+		bis.close();
 
-		int read;
-		while ((read=fis.read(myByteArray)) > 0) {
-			dos.write(myByteArray,0,read);
-		}
-		fis.close();*/
-		//dos.close();
-		/*File file = new File(FILE_TO_SEND);
-		ObjectInputStream ois = new ObjectInputStream(socketOfClient.getInputStream());
-		ObjectOutputStream oos = new ObjectOutputStream(socketOfClient.getOutputStream());
 
-		oos.writeObject(file.getName());
-
-		FileInputStream fis = new FileInputStream(file);
-		byte [] buffer = new byte[Server.FILE_SIZE];
-		Integer bytesRead = 0;
-
-		while ((bytesRead = fis.read(buffer)) > 0) {
-			oos.writeObject(bytesRead);
-			oos.writeObject(Arrays.copyOf(buffer, buffer.length));
-		}
-
-		oos.close();
-		ois.close();
-		System.exit(0);*/
-		File file = new File(FILE_TO_SEND);
-		FileInputStream fis = new FileInputStream(file);
-		BufferedInputStream bis = new BufferedInputStream(fis);
-
-		//Get socket's output stream
-		OutputStream os = socketOfClient.getOutputStream();
-
-		//Read File Contents into contents array
-		byte[] contents;
-		long fileLength = file.length();
-		long current = 0;
-
-		long start = System.nanoTime();
-		while(current!=fileLength){
-			int size = 10000;
-			if(fileLength - current >= size)
-				current += size;
-			else{
-				size = (int)(fileLength - current);
-				current = fileLength;
-			}
-			contents = new byte[size];
-			bis.read(contents, 0, size);
-			os.write(contents);
-			System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
-		}
-
-		os.flush();
-		//File transfer done. Close the socket connection!
-		//socketOfClient.close();
-		System.out.println("File sent succesfully!");
 	}
 }
